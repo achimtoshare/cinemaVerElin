@@ -6,11 +6,5 @@
 <jsp:include page="/WEB-INF/views/common/header.jsp">
 	<jsp:param value="" name="pageTitle"/>
 </jsp:include>	
-<script>
-function moveMemberEnroll(){
-	location.href="${pageContext.request.contextPath}/member/memberEnroll";
-}
-</script>
-<button onclick="moveMemberEnroll()">회원 가입</button>
-<jsp:include page="/WEB-INF/views/common/footer.jsp"/>
-
+${username }님 회원가입을 축하드립니다. 앞으로 이 사이트에서 제공되는 서비스들을 이용하실 수 있습니다. 
+<jsp:include page="/WEB-INF/views/common/footer.jsp"/>	

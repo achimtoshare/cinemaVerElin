@@ -58,4 +58,43 @@
 		</beans:property>
 	</beans:bean>
 	
+	
+		<!-- 로그인 검사용. -->
+	<interceptors>
+		<interceptor>
+			
+			<!-- 마이 페이지 -->
+			<mapping path="/member/memberView.do"/>
+			<mapping path="/member/searchMyPageKwd.do"/>
+			<mapping path="/member/instructorApply.do"/>
+			<mapping path="/member/searchMyPageEvaluation.do"/>
+			<mapping path="/member/applyButton.do"/>
+			<mapping path="/member/applyListView.do"/>
+			<mapping path="/member/reviewFinish.do"/>
+			<mapping path="/member/reviewEnroll.do"/>
+			<mapping path="/member/paymentList.do"/>
+			<mapping path="/member/paymentCancel.do"/>
+			<mapping path="/member/memberMessageList"/>
+			<mapping path="/member/memberMessageWriteEnd"/>
+			<mapping path="/member/memberMessageView"/>
+			
+			
+			<beans:bean class="com.kyeonghee.cinema.common.interceptor.LoginCheckInterceptor" id="loginCheck"/>
+		</interceptor>
+	</interceptors>
+	
+	<interceptors>
+		<interceptor>
+			<mapping path="/admin/**"/>
+			<!-- <exclude-mapping path="/admin/adminLogin"/> -->
+			<beans:bean class="com.kyeonghee.cinema.common.interceptor.AdminCheckInterceptor" id="adminCheck"/>
+		</interceptor>
+	</interceptors>
+	
+
+	
+	
+	
+	
+	
 </beans:beans>
