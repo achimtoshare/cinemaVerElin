@@ -75,7 +75,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <form action="${rootPath }/manager/managerLogin.do">
+        <form action="${rootPath }/manager/managerLogin.do" method="post">
         	<label for="idForm">아이디 : </label>
         	<input type="text" name="managerId" id="managerId" placeholder="아이디를 입력하세요" required="required" /><br />
         	<label for="pwForm">비밀번호 : </label>

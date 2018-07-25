@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="common">
+ 	<resultMap type="map" id="map"></resultMap>
+
+ 	<select id="selectLocal" resultMap="map">
+ 		select * from local
+ 	</select>
+	
+	<select id="selectTheater" resultMap="map">
+	 	select
+	 	<if test="type=='manager'">
+		t.tno, t.lno, t.tname, t.addr, t.tel, l.lname, mg.nno, mg.mgname, mg.photo, mg.managerid, mg.pw 
+		from theater t 
+		join local l on t.lno=l.lno left join manager mg on mg.tno=t.tno 
+		</if>
+		<if test="type=='ticket'">
+		* from theater t
+		</if>
+		where t.lno=#{lno}
+	</select> 	
+</mapper>

@@ -4,4 +4,15 @@
 	<select id="selectOneManager" resultType="manager">
 		select * from manager where managerid=#{managerId}
 	</select>
+	
+	<insert id="inserMovie">
+		insert into movie values(SEQ_MOVIE.NEXTVAL,#{mvname},#{ename},#{grade},#{runtime},#{director},#{actor},#{genre},#{poster},#{story},${subImg},#{trailer},'Y',#{relDate},sysdate)
+		<selectKey keyProperty="mvno"  resultType="_int" order="AFTER"> <!-- order 앞의 쿼리 후에 해라. -->
+   		SELECT SEQ_MOVIE.CURRVAL FROM DUAL
+   	</selectKey>	
+	</insert>
+	
+	<update id="updateSubImg">
+		update movie set subimg=#{subImg} where mvno=#{mvno}
+	</update>
 </mapper>

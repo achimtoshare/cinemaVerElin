@@ -85,8 +85,8 @@
 	
 	<interceptors>
 		<interceptor>
-			<mapping path="/admin/**"/>
-			<!-- <exclude-mapping path="/admin/adminLogin"/> -->
+			<mapping path="/manager/**"/>
+			<exclude-mapping path="/manager/managerLogin.do"/>
 			<beans:bean class="com.kyeonghee.cinema.common.interceptor.AdminCheckInterceptor" id="adminCheck"/>
 		</interceptor>
 	</interceptors>

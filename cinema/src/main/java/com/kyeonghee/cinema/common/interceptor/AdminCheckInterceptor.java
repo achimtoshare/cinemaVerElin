@@ -21,14 +21,14 @@ public class AdminCheckInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		HttpSession session = request.getSession();
-		/*Member memberLoggedIn = (Member)session.getAttribute("memberLoggedIn");*/
 		Manager managerLoggedIn =(Manager)session.getAttribute("managerLoggedIn");
 		
-		if("/cinema/manager/managerLogin".equals(request.getRequestURI())) {
-
+		System.out.println("dddd"+request.getRequestURI());
+		if("/cinema/manager/managerLogin.do".equals(request.getRequestURI())) {
+			if("ad".contains("ad01")) System.out.println("포함인데;;;");
 			if(managerLoggedIn != null ){
 				String admin = managerLoggedIn.getManagerId();
-				if(!(admin.equals("manager"))) {
+				if(!(admin.equals("admin"))&&!(admin.contains("ad"))) {
 					logger.info("비정상적 접근 : 관리자만 접근 가능합니다.");
 					logger.info("비정상적 접근 : 관리자만 접근 가능합니다.");
 					request.setAttribute("msg", "비정상적 접근 : 관리자만 접근 가능합니다.");
@@ -52,7 +52,7 @@ public class AdminCheckInterceptor extends HandlerInterceptorAdapter {
 				return false;
 			}else {
 				String admin = managerLoggedIn.getManagerId();
-				if(!(admin.equals("manager"))) {
+				if(!(admin.equals("admin"))&&!(admin.contains("ad"))) {
 					logger.info("비정상적 접근 : 관리자만 접근 가능합니다.");
 					request.setAttribute("msg", "비정상적 접근 : 관리자만 접근 가능합니다.");
 					request.setAttribute("loc", "/");
