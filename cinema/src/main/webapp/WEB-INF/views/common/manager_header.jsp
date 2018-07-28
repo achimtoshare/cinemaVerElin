@@ -48,7 +48,7 @@
 	    	 	 	<label for="">admin님</label>
 	    	 	 </c:if>
 	    	 	 <c:if test="${managerLoggedIn.getManagerId() ne 'admin' }">
-	    	 	 	<a class="nav-link" href="${rootPath }/manager/managerView.do?nno=${managerLoggedIn.getNno()}" >${managerLoggedIn.getMgname() }님</a>
+	    	 	 	<a class="nav-link" href="${rootPath }/manager/managerView.do?nno=${managerLoggedIn.getNno()}" >${managerTheater } ${managerLoggedIn.getMgname() }님</a>
 	    	 	 </c:if>
 	    	 
 	    	 </c:if>

@@ -1,5 +1,8 @@
 package com.kyeonghee.cinema.admin.model.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,41 @@ public class ManagerServiceImpl implements ManagerService {
 	public int updateSugImg(Movie m) {
 		// TODO Auto-generated method stub
 		return mgd.updateSubImg(m);
+	}
+	@Override
+	public List<Map<String, Object>> selectSchedule(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return mgd.selectSchedule(map);
+	}
+	@Override
+	public Map<String, Object> selectTheaterMG(int nno) {
+		// TODO Auto-generated method stub
+		return mgd.selectTheaterMG(nno);
+	}
+	@Override
+	public String selectManagerTheaterName(int tno) {
+		// TODO Auto-generated method stub
+		return mgd.selectManagerTheaterName(tno);
+	}
+	@Override
+	public List<Map<String, Object>> searchMovie(String searchName) {
+		// TODO Auto-generated method stub
+		return mgd.searchMovie(searchName);
+	}
+	@Override
+	public List<Map<String, Object>> selectRoomByTheater(int tno) {
+		// TODO Auto-generated method stub
+		return mgd.selectRoomByTheater(tno);
+	}
+	@Override
+	public int insertSchedule(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return mgd.insertSchedule(map);
+	}
+	@Override
+	public Map<String, Object> selectSeatInfo(int sno) {
+		// TODO Auto-generated method stub
+		return mgd.selectSeatInfo(sno);
 	}
 
 }

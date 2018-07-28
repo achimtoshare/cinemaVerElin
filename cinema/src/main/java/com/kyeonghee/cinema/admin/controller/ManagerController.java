@@ -17,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,7 +31,7 @@ import com.kyeonghee.cinema.common.select.SelectValue;
 import com.kyeonghee.cinema.member.model.vo.Member;
 import com.kyeonghee.cinema.movie.model.vo.Movie;
 
-@SessionAttributes("managerLoggedIn")
+@SessionAttributes({"managerLoggedIn","managerTheater"})
 @Controller
 public class ManagerController {
 	@Autowired
@@ -58,6 +60,10 @@ public class ManagerController {
 			if(bcryptPasswordEncoder.matches(pw, mg.getPw())) {
 				logger.debug("로그인 성공");
 				mav.addObject("managerLoggedIn", mg);
+				String managerTheater=mgs.selectManagerTheaterName(mg.getTno());
+				if(managerTheater==null) managerTheater="";
+				mav.addObject("managerTheater", managerTheater);
+				
 				msg="로그인 성공";
 				loc="/manager/movie";
 			}else {
@@ -76,6 +82,8 @@ public class ManagerController {
 	}
 	
 	
+	/********************** 관리자 페이지 이동 메소드 *****************************************/
+	
 	@RequestMapping("/manager/manager")
 	public String moveManager() {
 		return "manager/manager";
@@ -90,8 +98,15 @@ public class ManagerController {
 	public ModelAndView moveManagerSchedule(HttpSession session) {
 		ModelAndView mav = new ModelAndView();
 		Manager mg=null;
-		if(session!=null) mg=(Manager)session.getAttribute("managerLoggedIn");
 		
+		if(session!=null) {
+			mg=(Manager)session.getAttribute("managerLoggedIn");
+			
+		} 
+		
+		mav.addObject("managerLoggedIn",mg);
+		
+		mav.setViewName("manager/schedule");
 		
 		return mav;
 	}
@@ -240,6 +255,72 @@ public class ManagerController {
 		
 		List<Map<String,Object>> list= commonSelect.selectTheater(map);
 		mav.addObject("list",list);
+		
+		return mav;
+	}
+	
+	
+	
+	
+	/****************Manager Schedule ****************************************/
+	@RequestMapping("/manager/checkSchedule.do/{date}")
+	public ModelAndView selectSchedule(@PathVariable(value="date", required=false) String date) {
+		ModelAndView mav = new ModelAndView("jsonView");
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("date", date);
+		List<Map<String,Object>> list = mgs.selectSchedule(map);
+		mav.addObject("list",list);
+		return mav;
+		
+	}
+	
+	@RequestMapping("/manager/searchMovie.do")
+	public ModelAndView searchMovie(@RequestParam(value="searchName") String searchName) {
+		ModelAndView mav = new ModelAndView("jsonView");
+		
+		List<Map<String,Object>> list = mgs.searchMovie(searchName);
+		
+		mav.addObject("list", list);
+		
+		return mav;
+	}
+	
+	// 담당 매니저 영화관의 상영관 정보 가져오기
+	@RequestMapping("/manager/selectRoomByTheater.do")
+	@ResponseBody
+	public List<Map<String,Object>> selectRoomByTheater(@RequestParam(value="tno") int tno){
+		List<Map<String,Object>> list = mgs.selectRoomByTheater(tno);
+		
+		return list;
+	}
+	
+	
+	@RequestMapping("/manager/scheduleEnroll.do")
+	public ModelAndView insertSchedule(@RequestParam(value="mvno") int mvno, @RequestParam(value="rno") int rno,
+			@RequestParam(value="sTime") String sTime, @RequestParam(value="eTime") String eTime,@RequestParam(value="sno",defaultValue="0") int sno) {
+		ModelAndView mav = new ModelAndView();
+		
+		//좌석 값들 가져오기 
+	/*	Map<String,Object> seatInfo=new HashMap<>();
+		seatInfo = mgs.selectSeatInfo(sno);
+		*/
+		
+		System.out.println("sTime"+sTime);
+		System.out.println("eTime"+eTime);
+		Map<String,Object> map = new HashMap<>();
+		map.put("mvno", mvno);
+		map.put("rno", rno);
+		map.put("sTime", sTime);
+		map.put("eTime", eTime);
+		/*map.put("seat", seatInfo.get("shape"));
+		map.put("lseat", seatInfo.get("lseat"));*/
+		System.out.println("#############map"+map);
+		
+		int result = mgs.insertSchedule(map);
+		
+		mav.setViewName("manager/schedule");
+		
 		
 		return mav;
 	}

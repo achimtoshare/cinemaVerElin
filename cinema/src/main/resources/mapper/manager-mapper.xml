@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="manager">
+	<resultMap type="map" id="map"></resultMap>
+	
 	<select id="selectOneManager" resultType="manager">
 		select * from manager where managerid=#{managerId}
 	</select>
 	
 	<insert id="inserMovie">
-		insert into movie values(SEQ_MOVIE.NEXTVAL,#{mvname},#{ename},#{grade},#{runtime},#{director},#{actor},#{genre},#{poster},#{story},${subImg},#{trailer},'Y',#{relDate},sysdate)
+		insert into movie values(SEQ_MOVIE.NEXTVAL,#{mvname},#{ename},#{grade},#{runtime},#{director},#{actor},#{genre},#{poster},#{story},null,#{trailer},'Y',#{relDate},sysdate)
 		<selectKey keyProperty="mvno"  resultType="_int" order="AFTER"> <!-- order 앞의 쿼리 후에 해라. -->
    		SELECT SEQ_MOVIE.CURRVAL FROM DUAL
    	</selectKey>	
@@ -15,4 +17,39 @@
 	<update id="updateSubImg">
 		update movie set subimg=#{subImg} where mvno=#{mvno}
 	</update>
+	
+	<select id="selectSchedule" resultMap="map">
+		select shno, rno, substr(to_char(s.starttime,'HH24:mi'),1,2) sHour,
+			   substr(to_char(s.starttime,'HH24:mi'),4,2) sMin, 
+               substr(to_char(s.endtime,'HH24:mi'),1,2) eHour,
+               substr(to_char(s.endtime,'HH24:mi'),4,2) eMin, 
+               s.mvno,mvname 
+		from   schedule s join movie m on s.mvno=m.mvno
+		where  to_char(s.starttime,'yyyy-mm-dd')=#{date}
+	</select>
+	
+	<select id="selectTheaterMG" resultType="map">
+		select tno, tname from theater where tno=(select tno from manager where nno=#{nno})
+	</select>
+	
+	<select id="selectManagerTheaterName" resultType="string">
+		select tname from theater where tno=#{tno}
+	</select>
+	
+	<select id="searchMovie" resultMap="map">
+		select mvno, mvname, ename, grade, runtime, to_char(reldate,'yyyy-mm-dd') reldate 
+		from movie where status='Y' and mvname like '%'||#{searchName}||'%'
+	</select>
+	
+	<select id="selectRoomByTheater" resultMap="map">
+		select * from room where tno=#{tno}
+	</select>
+	
+	<insert id="insertSchedule">
+		insert into schedule values(SEQ_SCHEDULE.NEXTVAL,#{rno},#{mvno},to_date(#{sTime},'yyyy-mm-dd HH24:mi'),to_date(#{eTime},'yyyy-mm-dd HH24:mi'), sysdate,null,null) 
+	</insert>
+	
+	<select id="selectSeatInfo" resultType="map">
+		select shape, regexp_count(SHAPE, ',0|') lseat from seat
+	</select>	
 </mapper>
