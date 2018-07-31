@@ -138,13 +138,13 @@ $(function(){
 	function chooseReserved(target){
 		$("input#searchName").val(target.find("span.reservedMovie").text());
 		$("select#room").val(target.find("input[name=reRno]").val());
-		$("td.startTime").text($("li[total-min='"+target.find("input[name=reStartTotal]")+"']").text());
-		$("td.endTime").text($("li[total-min='"+target.find("input[name=reEndTotal]")+"']").text());
+		$("td.startTime").text($("li[total-min='"+target.find("input[name=reStartTotal]").val()+"']").text());
+		$("td.endTime").text($("li[total-min='"+target.find("input[name=reEndTotal]").val()+"']").text());
 		
-		console.log(target.find("input[name=reStartTotal]").text());
+		console.log(target.find("input[name=reStartTotal]").val());
 		
-		console.log($("li[total-min='"+target.find("input[name=reStartTotal]")+"']").text());
-		console.log($("li[total-min='"+target.find("input[name=reEndTotal]")+"']").text());
+		console.log($("li[total-min='"+target.find("input[name=reStartTotal]").val()+"']").text());
+		console.log($("li[total-min='"+target.find("input[name=reEndTotal]").val()+"']").text());
 		
 	}
 	
