@@ -314,23 +314,61 @@ public class ManagerController {
 		seatInfo = mgs.selectSeatInfo(sno);
 		*/
 		
-		System.out.println("sTime"+sTime);
-		System.out.println("eTime"+eTime);
-		Map<String,Object> map = new HashMap<>();
-		map.put("mvno", mvno);
-		map.put("rno", rno);
-		map.put("sTime", sTime);
-		map.put("eTime", eTime);
-		/*map.put("seat", seatInfo.get("shape"));
-		map.put("lseat", seatInfo.get("lseat"));*/
-		System.out.println("#############map"+map);
 		
-		int result = mgs.insertSchedule(map);
+		//중복 검사 함수
+		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime);
 		
-		mav.setViewName("manager/schedule");
 		
+		if(!isDuplicate) {
+			Map<String,Object> map = new HashMap<>();
+			map.put("mvno", mvno);
+			map.put("rno", rno);
+			map.put("sTime", sTime);
+			map.put("eTime", eTime);
+	/*		map.put("seat", seatInfo.get("shape"));
+			map.put("lseat", seatInfo.get("lseat"));*/
+			System.out.println("#############map"+map);
+			
+			int result = mgs.insertSchedule(map);
+			
+			mav.setViewName("manager/schedule");
+		}
 		
 		return mav;
+	}
+
+	
+	// 등록/수정하려는 시간과 이미 존재하는 스케쥴이 중복되는지 검사하는 메소드.
+	private boolean checkDuplicateSchedule(String sTime,String eTime) {
+		
+		/*, , ,;*/
+		
+		String date = sTime.substring(0, 10);
+		Map<String,Object> map=new HashMap<>();
+		map.put("date", date);
+		List<Map<String,Object>> list =selectSchedule(map);
+	
+		
+		int stotal_new = Integer.parseInt(sTime.substring(11, 13))*60+Integer.parseInt(sTime.substring(14));
+		int etotal_new = Integer.parseInt(eTime.substring(11, 13))*60+Integer.parseInt(eTime.substring(14));
+		
+		for(Map<String,Object> sc:list) {
+			int stotal = Integer.parseInt(sc.get("SHOUR").toString())*60+Integer.parseInt(sc.get("SMIN").toString());
+			int etotal = Integer.parseInt(sc.get("EHOUR").toString())*60+Integer.parseInt(sc.get("EMIN").toString());
+			
+			//아예 안 겹치는 경우
+			if(stotal>etotal_new || etotal<stotal_new) {
+				logger.info("안겹칩니다. 시간~~");
+				
+			}else {
+				logger.info("겹칩니다. 시간");
+				return true;
+			}
+			
+		}
+		
+		
+		return false;
 	}
 
 }
