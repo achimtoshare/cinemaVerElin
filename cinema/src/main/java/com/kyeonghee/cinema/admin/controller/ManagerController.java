@@ -269,12 +269,20 @@ public class ManagerController {
 		
 		Map<String,Object> map = new HashMap<>();
 		map.put("date", date);
-		List<Map<String,Object>> list = mgs.selectSchedule(map);
+		List<Map<String,Object>> list = selectSchedule(map); 
 		mav.addObject("list",list);
 		return mav;
 		
 	}
 	
+	
+	//해당 날짜의 등록된 스케쥴을 가져오는 메소드
+	private List<Map<String, Object>> selectSchedule(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return mgs.selectSchedule(map);
+	}
+
+
 	@RequestMapping("/manager/searchMovie.do")
 	public ModelAndView searchMovie(@RequestParam(value="searchName") String searchName) {
 		ModelAndView mav = new ModelAndView("jsonView");

@@ -20,7 +20,7 @@ ul.time-list{
 ul.time-list li{
 	cursor:pointer;
 }
-ul.time-list li:hover{
+ul.time-list li:hover:not(.reserved){
 	background:lightcoral;
 }
 div.schedule-container{
@@ -28,6 +28,9 @@ div.schedule-container{
 }
 .chooseTime{
 	background:lightblue;
+}
+li.reserved{
+	background:lightgray;
 }
 
 #autoComplete{position:absolute; background:#fff; border:1px solid #e0e0e0; padding-left:0px; margin-bottom:0px;}
@@ -58,9 +61,91 @@ $(function(){
 	
 	//시간을 선택한다. 
 	$("ul.time-list").on("click","li",function(){
-		if($("input#date").val()=="") alert("상영날짜를 선택하세요");
-		if($("input#searchName").val().trim()=="") alert("영화를 선택하세요");
 		
+		//이미 등록된 스케쥴을 클릭한 경우 false 처리 
+		if($(this).hasClass("reserved")){
+			alert("이미 등록된 스케쥴이 있습니다. 다시 선택하세요.");
+			return false;
+		}
+		
+		//상영날짜를 선택하지 않은 경우 false 처리 
+		if($("input#date").val()=="") {
+			alert("상영날짜를 선택하세요");
+			return false;
+		}
+		
+		//영화를 선택하지 않은 경우 false 처리 
+		if($("input#searchName").val().trim()=="") {
+			alert("영화를 선택하세요");
+			return false;
+		}
+		
+		//전에 선택된 시간 class chooseTime 제거하기
+		removeChooseTime();
+		
+
+		var start = parseInt( $(this).attr("total-min"));
+		var end= Math.ceil((start+ parseInt($("input#runtime").val())+30)*0.1)*10;
+		console.log("시간을 선택했을 때");
+		console.log(start);
+		console.log(end);
+		
+		//선택한 시간으로부터 끝나는 시간까지 나타내기. 
+		//이미 등록한 스케쥴 시간과 겹칠경우 break되며 chooseTime class를 제거한다. 중복 처리.
+		for(var s=start;s<=end+30;s+=10){
+			console.log("for문이 돈다.");
+			var li=$("ul.time-list li[total-min="+s+"]");
+			
+			if(li.hasClass("reserved")){
+				alert("이미 등록된 스케쥴과 시간이 겹칩니다. 다시 선택하세요");
+				removeChooseTime();
+				break;
+			}else{
+				li.addClass("chooseTime");			
+			}
+		}
+		
+		//시간 체크하기. 이미 예정된 스케쥴에 대해서도 잡아줘야함. 
+		//끝나는 시간에서 30분은 휴게시간이므로 넣어줌. 서버단에서도 잡아봐야함.
+		/* $("ul.time-list li").each(function(index,element){
+			console.log("each문 돌아염");
+			
+			//이미 등록된 스케쥴과 시간이 겹치는 경우
+			if($(this).hasClass("reserved")){
+				alert("이미 등록된 스케쥴과 시간이 겹칩니다. 다시 선택하세요");
+				removeChooseTime();
+				return false;
+			}else{ //이미 등록된 스케쥴과 겹치지 않는 경우.
+				if(parseInt($(this).attr("total-min"))>=start&&Math.ceil((parseInt($(this).attr("total-min")))*0.1)*10<=end+30){
+					$(this).addClass("chooseTime");
+				}
+			}
+			
+			
+		}); */
+		
+		
+		//시작 시간, 종료 시간을 나타냄.
+		if($("li.chooseTime").length>0){
+			$("td.startTime").text($("input#date").val()+" "+$(this).children("span.time-exp").text());
+			
+			$("td.endTime").text($("input#date").val()+" "+$("li.chooseTime:last").children("span.time-exp").text());
+			
+			$("input[name=eTime]").val($("td.endTime").text());
+			$("input[name=sTime]").val($("td.startTime").text());
+		}else{
+			$("td.startTime").text("");
+			
+			$("td.endTime").text("");
+			
+			$("input[name=eTime]").val("");
+			$("input[name=sTime]").val("");
+		}
+		
+		
+	});
+	function removeChooseTime(element){
+		console.log("removeChooseTime()");
 		//전에 또 선택한 시간들이 있다면 선택을 지워줘야함.
 		if($(".chooseTime").length!=0){
 		      $('.chooseTime').each(function(index, element){
@@ -68,31 +153,7 @@ $(function(){
 		      });
 		      
 		}
-		
-		var start = parseInt( $(this).attr("total-min"));
-		var end= start+ parseInt($("input#runtime").val());
-	
-		//시간 체크하기. 이미 예정된 스케쥴에 대해서도 잡아줘야함. 
-		//끝나는 시간에서 30분은 휴게시간이므로 넣어줌. 서버단에서도 잡아봐야함.
-		$("ul.time-list li").each(function(index,element){
-			console.log("each문 돌아염");
-			if(parseInt($(this).attr("total-min"))>=start&&parseInt($(this).attr("total-min"))<=end+30){
-				$(this).addClass("chooseTime");
-			}
-		});
-		
-		
-		//시작 시간, 종료 시간을 나타냄.
-		
-		$("td.startTime").text($("input#date").val()+" "+$(this).children("span.time-exp").text());
-	
-		$("td.endTime").text($("input#date").val()+" "+$("li.chooseTime:last").children("span.time-exp").text());
-		
-		$("input[name=eTime]").val($("td.endTime").text());
-		$("input[name=sTime]").val($("td.startTime").text());
-		
-	});
-	
+	}
 	
 	
 	
@@ -109,7 +170,8 @@ $(function(){
 		
 		for(var i=shour;i<=ehour;i++){
 			for(var j=0;j<min;j+=10){
-				createli +="<li time-hour='"+i+"' time-min='"+(j<10? "0"+j:j)+"' total-min='"+((i*60)+j)+"'><span class='time-exp'>"+(i<10? "0"+i:i)+":"+(j<10? "0"+j:j)+"</span><span class='reservedMovie'></span></li>";
+				createli +="<li time-hour='"+i+"' time-min='"+(j<10? "0"+j:j)+"' total-min='"+((i*60)+j)+"'><span class='time-exp'>"+(i<10? "0"+i:i)+":"+(j<10? "0"+j:j)+
+						   "</span><span class='reservedMovie'></span><input type='hidden' name='reMvno'><input type='hidden' name='reShno'><input type='hidden' name='reRno'></li>";
 			}
 		}
 		$("ul.time-list").html(createli);
@@ -205,12 +267,38 @@ function checkSchedule(){
 			console.log("checkSchedule");
 			console.log(data);
 			
+			for(var index in data.list){
+				var schedule=data.list[index];
+				drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO);
+			}
+			
+			
+			
 			showSchedule();
 		}
 	});
 	
 }
-
+function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno){
+	
+	var start = parseInt(shour)*60+parseInt(smin);
+	var end= parseInt(ehour)*60+parseInt(emin);
+	console.log(start);
+	console.log(end);
+	$("ul.time-list li").each(function(index,element){
+		console.log("each문 돌아염 -drawReservedSchedule()");
+		if(parseInt($(this).attr("total-min"))>=start&&Math.ceil((parseInt($(this).attr("total-min")))*0.1)*10<=end){
+			$(this).addClass("reserved");
+			$(this).children("span.reservedMovie").text(mvname);
+			$(this).children("input[name=reRvno]").val(mvno);
+			$(this).children("input[name=reShno]").val(shno);
+			$(this).children("input[name=rRno]").val(rno);
+			
+		}
+	});
+	
+	
+}
 function showSchedule(){
 	console.log("showSchedule");
 	
