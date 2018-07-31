@@ -62,9 +62,9 @@ $(function(){
 	//시간을 선택한다. 
 	$("ul.time-list").on("click","li",function(){
 		
-		//이미 등록된 스케쥴을 클릭한 경우 false 처리 
+		//이미 등록된 스케쥴을 클릭한 경우 수정하려는 것으로 간주, 함수 호출 처리 
 		if($(this).hasClass("reserved")){
-			alert("이미 등록된 스케쥴이 있습니다. 다시 선택하세요.");
+			chooseReserved($(this));
 			return false;
 		}
 		
@@ -104,27 +104,6 @@ $(function(){
 				li.addClass("chooseTime");			
 			}
 		}
-		
-		//시간 체크하기. 이미 예정된 스케쥴에 대해서도 잡아줘야함. 
-		//끝나는 시간에서 30분은 휴게시간이므로 넣어줌. 서버단에서도 잡아봐야함.
-		/* $("ul.time-list li").each(function(index,element){
-			console.log("each문 돌아염");
-			
-			//이미 등록된 스케쥴과 시간이 겹치는 경우
-			if($(this).hasClass("reserved")){
-				alert("이미 등록된 스케쥴과 시간이 겹칩니다. 다시 선택하세요");
-				removeChooseTime();
-				return false;
-			}else{ //이미 등록된 스케쥴과 겹치지 않는 경우.
-				if(parseInt($(this).attr("total-min"))>=start&&Math.ceil((parseInt($(this).attr("total-min")))*0.1)*10<=end+30){
-					$(this).addClass("chooseTime");
-				}
-			}
-			
-			
-		}); */
-		
-		
 		//시작 시간, 종료 시간을 나타냄.
 		if($("li.chooseTime").length>0){
 			$("td.startTime").text($("input#date").val()+" "+$(this).children("span.time-exp").text());
@@ -155,8 +134,19 @@ $(function(){
 		}
 	}
 	
-	
-	
+	//이미 등록된 스케쥴을 눌러서 폼에 그 값을 set하는 함수
+	function chooseReserved(target){
+		$("input#searchName").val(target.find("span.reservedMovie").text());
+		$("select#room").val(target.find("input[name=reRno]").val());
+		$("td.startTime").text($("li[total-min='"+target.find("input[name=reStartTotal]")+"']").text());
+		$("td.endTime").text($("li[total-min='"+target.find("input[name=reEndTotal]")+"']").text());
+		
+		console.log(target.find("input[name=reStartTotal]").text());
+		
+		console.log($("li[total-min='"+target.find("input[name=reStartTotal]")+"']").text());
+		console.log($("li[total-min='"+target.find("input[name=reEndTotal]")+"']").text());
+		
+	}
 	
 	
 	//시간 리스트 보여주기
@@ -171,7 +161,8 @@ $(function(){
 		for(var i=shour;i<=ehour;i++){
 			for(var j=0;j<min;j+=10){
 				createli +="<li time-hour='"+i+"' time-min='"+(j<10? "0"+j:j)+"' total-min='"+((i*60)+j)+"'><span class='time-exp'>"+(i<10? "0"+i:i)+":"+(j<10? "0"+j:j)+
-						   "</span><span class='reservedMovie'></span><input type='hidden' name='reMvno'><input type='hidden' name='reShno'><input type='hidden' name='reRno'></li>";
+						   "</span><span class='reservedMovie'></span><input type='hidden' name='reMvno'><input type='hidden' name='reShno'>"+
+						   "<input type='hidden' name='reRno'><input type='hidden' name='reStartTotal'><input type='hidden' name='reEndTotal'></li>";
 			}
 		}
 		$("ul.time-list").html(createli);
@@ -235,15 +226,11 @@ $(function(){
 					console.log(data);
 					//아무값도 넘어오지 않는 경우, data.split(",")의 배열 길이가 1임.
 					autoComplete.empty();
-					/* movieChoose.append("<ul id='autoComplete'>") */
 					
 					for(i in data.list){
 						var mv=data.list[i];
-						//var moviedata = JSON.stringify(data[i]);
 						autoComplete.append("<li onclick='fn_selectMovie("+mv.MVNO+", \""+mv.MVNAME+"\","+mv.RUNTIME+")'>" + mv.MVNO+ " , "+mv.MVNAME +"</li>" );
-/* 						movieChoose.append("<li onclick='fn_selectMovie("+mv.MVNO+", \""+mv.MVNAME+"\","+mv.RUNTIME+")'>" + mv.MVNO+ " , "+mv.MVNAME +"</li>" ); */
 					}
-					/* movieChoose.append("</ul>"); */
 
 					
 				}
@@ -271,9 +258,6 @@ function checkSchedule(){
 				var schedule=data.list[index];
 				drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO);
 			}
-			
-			
-			
 			showSchedule();
 		}
 	});
@@ -290,10 +274,11 @@ function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno){
 		if(parseInt($(this).attr("total-min"))>=start&&Math.ceil((parseInt($(this).attr("total-min")))*0.1)*10<=end){
 			$(this).addClass("reserved");
 			$(this).children("span.reservedMovie").text(mvname);
-			$(this).children("input[name=reRvno]").val(mvno);
+			$(this).children("input[name=reMvno]").val(mvno);
 			$(this).children("input[name=reShno]").val(shno);
-			$(this).children("input[name=rRno]").val(rno);
-			
+			$(this).children("input[name=reRno]").val(rno);
+			$(this).children("input[name=reStartTotal]").val(parseInt(shour)*60+parseInt(smin));
+			$(this).children("input[name=reEndTotal]").val(parseInt(ehour)*60+parseInt(emin));
 		}
 	});
 	
