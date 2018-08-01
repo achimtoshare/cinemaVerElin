@@ -28,4 +28,8 @@ public interface ManagerDAO {
 
 	Map<String, Object> selectSeatInfo(int rno);
 
+	int updateSchedule(Map<String, Object> map);
+
+	int deleteSchedule(int shno);
+
 }

@@ -11,7 +11,9 @@ ul{
  list-style: none;
 }
 div.scheduleFrm-wrap, div.time-wrap{
-	
+	min-height:400px;
+	float:left;
+	overflow:hidden;
 }
 ul.time-list{
 	height:400px; 
@@ -32,6 +34,14 @@ div.schedule-container{
 li.reserved{
 	background:lightgray;
 }
+div.timeTable-wrap{
+	clear:both;
+	overflow:hidden;
+	
+	
+}
+button#checkTime{
+}
 
 #autoComplete{position:absolute; background:#fff; border:1px solid #e0e0e0; padding-left:0px; margin-bottom:0px;}
 #autoComplete li{padding:10px; border-bottom:1px solid #ececec;}
@@ -39,6 +49,8 @@ li.reserved{
 .movieChoose li{padding:10px; border-bottom:1px solid #ececec;}
 </style>
 <script>
+var selectedReserved;
+
 $(function(){
 	showTimeList();
 	$(".movieChoose").hide();
@@ -65,6 +77,7 @@ $(function(){
 		//이미 등록된 스케쥴을 클릭한 경우 수정하려는 것으로 간주, 함수 호출 처리 
 		if($(this).hasClass("reserved")){
 			chooseReserved($(this));
+			selectedReserved=$(this);
 			return false;
 		}
 		
@@ -90,9 +103,17 @@ $(function(){
 		console.log(start);
 		console.log(end);
 		
+		
+		if($("ul.time-list li[total-min="+end+"]").length==0){
+			alert("선택가능한 시간대를 넘었습니다.");
+			return;
+		}
+		
 		//선택한 시간으로부터 끝나는 시간까지 나타내기. 
 		//이미 등록한 스케쥴 시간과 겹칠경우 break되며 chooseTime class를 제거한다. 중복 처리.
-		for(var s=start;s<=end+30;s+=10){
+		
+		
+		for(var s=start;s<=end;s+=10){
 			console.log("for문이 돈다.");
 			var li=$("ul.time-list li[total-min="+s+"]");
 			
@@ -136,16 +157,21 @@ $(function(){
 	
 	//이미 등록된 스케쥴을 눌러서 폼에 그 값을 set하는 함수
 	function chooseReserved(target){
+		//이미 등록된 스케쥴의 정보를 가져와서 set함
 		$("input#searchName").val(target.find("span.reservedMovie").text());
-		$("select#room").val(target.find("input[name=reRno]").val());
-		$("td.startTime").text($("li[total-min='"+target.find("input[name=reStartTotal]").val()+"']").text());
-		$("td.endTime").text($("li[total-min='"+target.find("input[name=reEndTotal]").val()+"']").text());
+		$("select#room").val(target.find("input.reRno").val());
+		$("td.startTime").text($("input#date").val()+" "+$("li[total-min='"+target.find("input.reStartTotal").val()+"']").find("span.time-exp").text());
+		$("td.endTime").text($("input#date").val()+" "+$("li[total-min='"+target.find("input.reEndTotal").val()+"']").find("span.time-exp").text());
 		
-		console.log(target.find("input[name=reStartTotal]").val());
+		//폼의 속성에 readonly를 추가함. 
+		$("input#date").attr("readonly",true);
+		$("input#searchName").attr("readonly",true);
+		$("select#room").attr("disabled",true);
 		
-		console.log($("li[total-min='"+target.find("input[name=reStartTotal]").val()+"']").text());
-		console.log($("li[total-min='"+target.find("input[name=reEndTotal]").val()+"']").text());
-		
+		//수정, 삭제버튼 활성화, 등록 비활성화
+		$("button.btn-update").removeAttr("disabled");
+		$("button.btn-delete").removeAttr("disabled");
+		$("button.btn-insert").attr("disabled",true);
 	}
 	
 	
@@ -160,9 +186,10 @@ $(function(){
 		
 		for(var i=shour;i<=ehour;i++){
 			for(var j=0;j<min;j+=10){
+				if(i==24&&j>0) break;
 				createli +="<li time-hour='"+i+"' time-min='"+(j<10? "0"+j:j)+"' total-min='"+((i*60)+j)+"'><span class='time-exp'>"+(i<10? "0"+i:i)+":"+(j<10? "0"+j:j)+
-						   "</span><span class='reservedMovie'></span><input type='hidden' name='reMvno'><input type='hidden' name='reShno'>"+
-						   "<input type='hidden' name='reRno'><input type='hidden' name='reStartTotal'><input type='hidden' name='reEndTotal'></li>";
+						   "</span>&nbsp;&nbsp;<span class='reservedMovie'></span><input type='hidden' class='reMvno'><input type='hidden' class='reShno'>"+
+						   "<input type='hidden' class='reRno'><input type='hidden' class='reStartTotal'><input type='hidden' class='reEndTotal'><input type='hidden' class='reRuntime'></li>";
 			}
 		}
 		$("ul.time-list").html(createli);
@@ -239,12 +266,114 @@ $(function(){
 		
 		
 	});
+	
+	//수정 버튼 클릭 이벤트
+	$("button.btn-update").click(function(){
+		
+		console.log("수정모드입니다");
+		
+		if($("input.isUpdate").val()=="false"){
+			var start = parseInt(selectedReserved.find("input.reStartTotal").val());
+			var end= parseInt(selectedReserved.find("input.reEndTotal").val());
+			
+			for(var s=start;s<=end;s+=10){
+				var li=$("ul.time-list li[total-min="+s+"]");
+				
+				//수정 모드 이므로 이미 등록된 상태를 나타내는 클래스를 제거하고 chooseTime으로 바꾸어준다. 
+				if(li.hasClass("reserved")){
+					li.removeClass("reserved");
+					li.addClass("chooseTime");			
+				}
+				li.children("span.reservedMovie").empty();
+			}
+			
+			//기존의 영화의 번호, 러닝타임 저장
+			$("input#mvno").val(selectedReserved.find("input.reMvno").val());
+			$("input#runtime").val(selectedReserved.children("input.reRuntime").val());
+			
+			//readonly 속성, disabled속성 품.
+			$("input#date").removeAttr("readonly");
+			$("input#searchName").removeAttr("readonly");
+			$("select#room").removeAttr("disabled");
+			$(this).text("수정 완료");
+			
+			$("input.isUpdate").val("true");
+		}else{
+			var param={shno:selectedReserved.find("input.reShno").val(),mvno:$("input#mvno").val(),rno:$("select#room").val(),sTime:$("input[name=sTime]").val(),eTime:$("input[name=eTime]").val()};
+			$.ajax({
+				url:"updateSchedule.do",
+				data:param,
+				type:"post",
+				dataType:"json",
+				success:function(data){
+					if(data>0){
+						alert("수정되었습니다.");
+						$("button#checkTime").trigger('click');
+						
+					}else if(data==0){
+						alert("수정 실패하였습니다. 다시 해주세요");
+					}else{
+						alert("겹치는 시간의 스케쥴이 있습니다. 다시 해주세요");
+					}
+					console.log(data);
+				}
+			});
+			
+			initForm();
+			$(this).text("수정");
+			$("input.isUpdate").val("false");
+			
+		}
+	});
+	
+	
+	//삭제 버튼 클릭 이벤트
+	$("button.btn-delete").click(function(){
+		if(confirm("정말 삭제하시겠습니까?")){
+			$.ajax({
+				url:"deleteSchedule.do",
+				dataType:"json",
+				data:{shno:selectedReserved.children("input.reShno").val()},
+				success:function(data){
+					console.log(data);
+					if(data>0){
+						alert("삭제되었습니다.");
+					    var start = parseInt(selectedReserved.find("input.reStartTotal").val());
+						var end= parseInt(selectedReserved.find("input.reEndTotal").val());
+						
+						for(var s=start;s<=end;s+=10){
+							var li=$("ul.time-list li[total-min="+s+"]");
+							
+							//삭제 모드 이므로 이미 등록된 상태를 나타내는 클래스를 제거 
+							li.removeClass("reserved");
+							li.children(".reservedMovie").empty();
+							li.children("input").val("");
+						}
+						initForm();
+					    
+					    $("button#checkTime").trigger('click');
+					    
+					}else{
+						alert("실패하였습니다.");
+					}
+					
+				}
+			});
+		}
+	});
 
 });
+
+//이미 등록된 스케쥴 가져옴.
 function checkSchedule(){
 	var date = $("#date").val();
 	
 	if(date=="") return;
+	
+	//삭제했을 경우 기존의값들을 지워야함..
+	
+	
+	
 	
 	$.ajax({
 		url:"${rootPath}/manager/checkSchedule.do/"+date,
@@ -256,14 +385,16 @@ function checkSchedule(){
 			
 			for(var index in data.list){
 				var schedule=data.list[index];
-				drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO);
+				drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO,schedule.RUNTIME);
 			}
 			showSchedule();
 		}
 	});
 	
 }
-function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno){
+
+//이미 등록된 스케쥴 가져온 것을 가지고 시간표에 나타냄.
+function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno,runtime){
 	
 	var start = parseInt(shour)*60+parseInt(smin);
 	var end= parseInt(ehour)*60+parseInt(emin);
@@ -274,11 +405,12 @@ function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno){
 		if(parseInt($(this).attr("total-min"))>=start&&Math.ceil((parseInt($(this).attr("total-min")))*0.1)*10<=end){
 			$(this).addClass("reserved");
 			$(this).children("span.reservedMovie").text(mvname);
-			$(this).children("input[name=reMvno]").val(mvno);
-			$(this).children("input[name=reShno]").val(shno);
-			$(this).children("input[name=reRno]").val(rno);
-			$(this).children("input[name=reStartTotal]").val(parseInt(shour)*60+parseInt(smin));
-			$(this).children("input[name=reEndTotal]").val(parseInt(ehour)*60+parseInt(emin));
+			$(this).children("input.reMvno").val(mvno);
+			$(this).children("input.reShno").val(shno);
+			$(this).children("input.reRno").val(rno);
+			$(this).children("input.reStartTotal").val(parseInt(shour)*60+parseInt(smin));
+			$(this).children("input.reEndTotal").val(parseInt(ehour)*60+parseInt(emin));
+			$(this).children("input.reRuntime").val(runtime);
 		}
 	});
 	
@@ -302,6 +434,27 @@ function fn_selectMovie(mvno, mvname,runtime){
 	console.log("mvno");
 	console.log($("input#mvno").val());
 }
+
+//폼을 초기화시킴. 상영 날짜 제외.
+function initForm(){
+	console.log("initForm()");
+	$("input#searchName").val("");
+	$("input#mvno").val("");
+	$("input#runtime").val("");
+	$("input[name=sTime]").val("");
+	$("input[name=eTime]").val("");
+	$("inpupt.isUpdate").val("false");
+	$(".btn-update").attr("disabled",true);
+	$(".btn-delete").attr("disabled",true);
+	$(".btn-insert").removeAttr("disabled");
+	$("td.startTime").text("");
+	$("td.endTime").text("");
+	$("input#date").removeAttr("readonly");
+	$("input#searchName").removeAttr("readonly");
+	$("select#room").removeAttr("disabled");
+	selectedReserved="";
+	
+}
 function validate(){
 	
 	
@@ -309,14 +462,14 @@ function validate(){
 }
 
 </script>
-<div class="schedule-container">
-	<div class="scheduleFrm-wrap">
+<div class="schedule-container container">
+	<div class="scheduleFrm-wrap col-6">
 		<form action="scheduleEnroll.do" name="scheduleFrm" method="post" onsubmit="return validate()">
 			<table>
 				<tr>
 					<th>날짜</th>
 					<td><input type="date" name="" id="date" /></td>
-					<td><button type="button" onclick="checkSchedule()">시간표 조회</button></td>
+					<td><button type="button" onclick="checkSchedule()" id="checkTime" class="btn btn-primary">시간표 조회</button></td>
 				</tr>
 				<tr>
 					<th>영화 검색</th>
@@ -332,13 +485,13 @@ function validate(){
 						
 						</select>
 					</td>
-					<td>좌석수 : </td>
+					<td><!-- 좌석수 :  --></td>
 				</tr>
-				<tr>
+				<!-- <tr>
 					<th>좌석타입</th>
 					<td></td>
 					<td></td>
-				</tr>
+				</tr> -->
 				<tr>
 					<th>시작시간</th>
 					<td class="startTime"></td>
@@ -351,22 +504,26 @@ function validate(){
 				</tr>
 				<tr>
 					<td colspan="3">
-						<button type="submit" class="btn btn-insert" value="insert">등록</button>
-						<button type="submit" class="btn btn-update" value="update">수정</button>
-						<button type="button" class="btn btn-delete" value="delete">삭제</button>
+						<button type="submit" class="btn btn-insert btn-dark" value="insert">등록</button>
+						<button type="button" class="btn btn-update btn-dark" disabled value="update">수정</button>
+						<button type="button" class="btn btn-delete btn-dark" disabled value="delete">삭제</button>
 						<input type="hidden" name="sno" />
+						<input type="hidden" class="isUpdate" value="false" />
 					</td>
 				</tr>
 			
 			</table>
 		</form>
 	</div>
-	<div class="time-wrap">
+	<div class="time-wrap col-6">
 		<ul class="time-list">
 		
 		
 		</ul>
 	
+	</div>
+	<div class="timeTable-wrap  col">
+		
 	</div>
 </div>
 <jsp:include page="/WEB-INF/views/common/manager_footer.jsp"/>	

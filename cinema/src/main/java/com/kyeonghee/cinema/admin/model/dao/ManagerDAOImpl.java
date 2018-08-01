@@ -76,4 +76,15 @@ public class ManagerDAOImpl implements ManagerDAO {
 		return sqlSession.selectOne("manager.selectSeatInfo", sno);
 	}
 
+	@Override
+	public int updateSchedule(Map<String, Object> map) {
+		return sqlSession.update("manager.updateSchedule",map);
+	}
+
+	@Override
+	public int deleteSchedule(int shno) {
+		// TODO Auto-generated method stub
+		return sqlSession.delete("manager.deleteSchedule", shno);
+	}
+
 }

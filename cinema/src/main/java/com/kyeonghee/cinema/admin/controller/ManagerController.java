@@ -315,8 +315,9 @@ public class ManagerController {
 		*/
 		
 		
+		
 		//중복 검사 함수
-		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime);
+		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,0);
 		
 		
 		if(!isDuplicate) {
@@ -339,13 +340,16 @@ public class ManagerController {
 
 	
 	// 등록/수정하려는 시간과 이미 존재하는 스케쥴이 중복되는지 검사하는 메소드.
-	private boolean checkDuplicateSchedule(String sTime,String eTime) {
+	private boolean checkDuplicateSchedule(String sTime,String eTime, int shno) {
 		
 		/*, , ,;*/
 		
 		String date = sTime.substring(0, 10);
 		Map<String,Object> map=new HashMap<>();
 		map.put("date", date);
+		
+		//shno값이 0이 아니라면, update할때 중복검사를 하는 것이므로 맵에 값을 추가해준다. 
+		if(shno!=0) map.put("shno", shno);
 		List<Map<String,Object>> list =selectSchedule(map);
 	
 		
@@ -369,6 +373,48 @@ public class ManagerController {
 		
 		
 		return false;
+	}
+	
+	
+	@RequestMapping("/manager/updateSchedule.do")
+	@ResponseBody
+	public int updateSchedule(@RequestParam(value="shno") int shno, @RequestParam(value="rno") int rno, 
+			@RequestParam("mvno") int mvno, @RequestParam(value="sTime") String sTime,@RequestParam(value="eTime") String eTime) {
+		
+		int result =0;
+		
+		//중복 검사 함수
+		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,shno);
+		
+		
+		if(!isDuplicate) {
+			Map<String,Object> map = new HashMap<>();
+			map.put("mvno", mvno);
+			map.put("rno", rno);
+			map.put("shno",shno);
+			map.put("sTime", sTime);
+			map.put("eTime", eTime);
+	/*		map.put("seat", seatInfo.get("shape"));
+			map.put("lseat", seatInfo.get("lseat"));*/
+			System.out.println("#############map"+map);
+			
+		
+			result = mgs.updateSchedule(map);
+		}else {
+			result=-1;
+		}
+		return result;
+		
+	}
+	
+	
+	@RequestMapping(value="/manager/deleteSchedule.do")
+	@ResponseBody
+	public int deleteSchedule(@RequestParam(value="shno", required=true) int shno) {
+		int result = 0;
+		result = mgs.deleteSchedule(shno);
+				
+		return result;
 	}
 
 }

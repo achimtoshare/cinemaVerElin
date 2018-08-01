@@ -28,4 +28,8 @@ public interface ManagerService {
 
 	Map<String, Object> selectSeatInfo(int sno);
 
+	int updateSchedule(Map<String, Object> map);
+
+	int deleteSchedule(int shno);
+
 }

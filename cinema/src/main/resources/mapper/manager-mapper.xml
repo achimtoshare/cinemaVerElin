@@ -23,9 +23,12 @@
 			   substr(to_char(s.starttime,'HH24:mi'),4,2) sMin, 
                substr(to_char(s.endtime,'HH24:mi'),1,2) eHour,
                substr(to_char(s.endtime,'HH24:mi'),4,2) eMin, 
-               s.mvno,mvname 
+               s.mvno,mvname, m.runtime
 		from   schedule s join movie m on s.mvno=m.mvno
 		where  to_char(s.starttime,'yyyy-mm-dd')=#{date}
+		<if test="shno!=null and shno!=0">
+		and not shno=#{shno}
+		</if>
 	</select>
 	
 	<select id="selectTheaterMG" resultType="map">
@@ -52,4 +55,12 @@
 	<select id="selectSeatInfo" resultType="map">
 		select shape, regexp_count(SHAPE, ',0|') lseat from seat
 	</select>	
+	
+	<update id="updateSchedule">
+		update schedule set mvno=#{mvno}, rno=#{rno}, starttime=to_date(#{sTime},'yyyy-mm-dd HH24:mi'), endtime=to_date(#{eTime},'yyyy-mm-dd HH24:mi') where shno=#{shno}
+	</update>
+	
+	<delete id="deleteSchedule">
+		delete from schedule where shno=#{shno}
+	</delete>
 </mapper>

@@ -65,5 +65,13 @@ public class ManagerServiceImpl implements ManagerService {
 		// TODO Auto-generated method stub
 		return mgd.selectSeatInfo(sno);
 	}
+	@Override
+	public int updateSchedule(Map<String, Object> map) {
+		return mgd.updateSchedule(map);
+	}
+	@Override
+	public int deleteSchedule(int shno) {
+		return mgd.deleteSchedule(shno);
+	}
 
 }
