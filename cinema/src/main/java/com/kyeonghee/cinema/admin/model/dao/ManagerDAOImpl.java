@@ -87,4 +87,15 @@ public class ManagerDAOImpl implements ManagerDAO {
 		return sqlSession.delete("manager.deleteSchedule", shno);
 	}
 
+	@Override
+	public List<Map<String, Object>> selectMovieAll() {
+		return sqlSession.selectList("manager.selectMovieAll");
+	}
+
+	@Override
+	public int updateMovie(Movie m) {
+		// TODO Auto-generated method stub
+		return sqlSession.update("manager.updateMovie", m);
+	}
+
 }

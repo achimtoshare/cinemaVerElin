@@ -73,5 +73,14 @@ public class ManagerServiceImpl implements ManagerService {
 	public int deleteSchedule(int shno) {
 		return mgd.deleteSchedule(shno);
 	}
+	@Override
+	public List<Map<String, Object>> selectMovieAll() {
+		return mgd.selectMovieAll();
+	}
+	@Override
+	public int updateMovie(Movie m) {
+		// TODO Auto-generated method stub
+		return mgd.updateMovie(m);
+	}
 
 }

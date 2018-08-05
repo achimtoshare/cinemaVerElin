@@ -32,4 +32,8 @@ public interface ManagerService {
 
 	int deleteSchedule(int shno);
 
+	List<Map<String, Object>> selectMovieAll();
+
+	int updateMovie(Movie m);
+
 }

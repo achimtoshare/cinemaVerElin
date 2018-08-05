@@ -63,4 +63,24 @@
 	<delete id="deleteSchedule">
 		delete from schedule where shno=#{shno}
 	</delete>
+	
+	<select id="selectMovieAll" resultMap="map">
+		select floor(sysdate-reldate) dday, mvno,mvname,ename,grade,runtime,director,actor,genre,poster,
+		story,subimg,trailer,status,to_char(reldate,'yyyy-mm-dd') reldate,to_char(regdate,'yyyy-mm-dd') regdate  
+		from movie
+		where status='Y'
+		order by dday,reldate desc
+	</select>
+	
+	<update id="updateMovie">
+		update movie set mvname=#{mvname}, ename=#{ename}, grade=#{grade}, runtime=#{runtime}, director=#{director}, actor=#{actor}, genre=#{genre},
+                 		 story=#{story}, trailer=#{trailer},reldate=#{relDate}
+                 		 <if test="poster!=null and poster!=''">
+                 		 ,poster=#{poster}
+                 		 </if>
+                 		 <if test="subImg!=null and subImg!=''">
+                 		 ,subimg=#{subImg}
+                 		 </if>
+                 		 where mvno=#{mvno}
+	</update>
 </mapper>
