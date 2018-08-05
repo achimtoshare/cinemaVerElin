@@ -413,12 +413,13 @@ public class ManagerController {
 	
 	
 	/****************Manager Schedule ****************************************/
-	@RequestMapping("/manager/checkSchedule.do/{date}")
-	public ModelAndView selectSchedule(@PathVariable(value="date", required=false) String date) {
+	@RequestMapping("/manager/checkSchedule.do/{date}/{rno}")
+	public ModelAndView selectSchedule(@PathVariable(value="date", required=false) String date,@PathVariable(value="rno") int rno) {
 		ModelAndView mav = new ModelAndView("jsonView");
 		
 		Map<String,Object> map = new HashMap<>();
 		map.put("date", date);
+		map.put("rno", rno);
 		List<Map<String,Object>> list = selectSchedule(map); 
 		mav.addObject("list",list);
 		return mav;
@@ -467,7 +468,7 @@ public class ManagerController {
 		
 		
 		//중복 검사 함수
-		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,0);
+		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,rno,0);
 		
 		
 		if(!isDuplicate) {
@@ -490,13 +491,14 @@ public class ManagerController {
 
 	
 	// 등록/수정하려는 시간과 이미 존재하는 스케쥴이 중복되는지 검사하는 메소드.
-	private boolean checkDuplicateSchedule(String sTime,String eTime, int shno) {
+	private boolean checkDuplicateSchedule(String sTime,String eTime, int rno,int shno) {
 		
 		/*, , ,;*/
 		
 		String date = sTime.substring(0, 10);
 		Map<String,Object> map=new HashMap<>();
 		map.put("date", date);
+		map.put("rno", rno);
 		
 		//shno값이 0이 아니라면, update할때 중복검사를 하는 것이므로 맵에 값을 추가해준다. 
 		if(shno!=0) map.put("shno", shno);
@@ -534,7 +536,7 @@ public class ManagerController {
 		int result =0;
 		
 		//중복 검사 함수
-		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,shno);
+		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,rno,shno);
 		
 		
 		if(!isDuplicate) {

@@ -29,6 +29,9 @@
 		<if test="shno!=null and shno!=0">
 		and not shno=#{shno}
 		</if>
+		<if test="rno!=null and rno!=0">
+		and rno=#{rno}
+		</if>
 	</select>
 	
 	<select id="selectTheaterMG" resultType="map">

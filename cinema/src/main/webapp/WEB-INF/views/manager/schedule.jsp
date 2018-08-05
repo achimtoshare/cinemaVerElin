@@ -51,6 +51,7 @@ button#checkTime{
 <script>
 var selectedReserved;
 
+
 $(function(){
 	showTimeList();
 	$(".movieChoose").hide();
@@ -173,6 +174,34 @@ $(function(){
 		$("button.btn-delete").removeAttr("disabled");
 		$("button.btn-insert").attr("disabled",true);
 	}
+	
+	//시간표 조회 클릭 버튼 이벤트
+	$("button#checkTime").click(function(){
+		var date = $("#date").val();
+		var rno = $("#room").val();
+		if(date=="") return;
+		
+		//삭제했을 경우 기존의값들을 지워야함..
+		
+		showTimeList();
+		
+		
+		$.ajax({
+			url:"${rootPath}/manager/checkSchedule.do/"+date+"/"+rno,
+			dataType:"json",
+			success:function(data){
+				
+				console.log("checkSchedule");
+				console.log(data);
+				
+				for(var index in data.list){
+					var schedule=data.list[index];
+					drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO,schedule.RUNTIME);
+				}
+				showSchedule();
+			}
+		});
+	});
 	
 	
 	//시간 리스트 보여주기
@@ -364,34 +393,7 @@ $(function(){
 
 });
 
-//이미 등록된 스케쥴 가져옴.
-function checkSchedule(){
-	var date = $("#date").val();
-	
-	if(date=="") return;
-	
-	//삭제했을 경우 기존의값들을 지워야함..
-	
-	
-	
-	
-	$.ajax({
-		url:"${rootPath}/manager/checkSchedule.do/"+date,
-		dataType:"json",
-		success:function(data){
-			
-			console.log("checkSchedule");
-			console.log(data);
-			
-			for(var index in data.list){
-				var schedule=data.list[index];
-				drawReservedSchedule(schedule.SHNO,schedule.SHOUR,schedule.SMIN,schedule.EHOUR,schedule.EMIN,schedule.MVNO,schedule.MVNAME,schedule.RNO,schedule.RUNTIME);
-			}
-			showSchedule();
-		}
-	});
-	
-}
+
 
 //이미 등록된 스케쥴 가져온 것을 가지고 시간표에 나타냄.
 function drawReservedSchedule(shno,shour,smin,ehour,emin,mvno,mvname,rno,runtime){
@@ -469,14 +471,7 @@ function validate(){
 				<tr>
 					<th>날짜</th>
 					<td><input type="date" name="" id="date" /></td>
-					<td><button type="button" onclick="checkSchedule()" id="checkTime" class="btn btn-primary">시간표 조회</button></td>
-				</tr>
-				<tr>
-					<th>영화 검색</th>
-					<td><input type="text" id="searchName" /><ul id="autoComplete"></ul>
-						<input type="hidden" name="mvno" id="mvno"/><input type="hidden" id="runtime" />
-					</td>
-					<td></td>
+					<td><button type="button" id="checkTime" class="btn btn-primary">시간표 조회</button></td>
 				</tr>
 				<tr>
 					<th>상영관</th>
@@ -487,6 +482,14 @@ function validate(){
 					</td>
 					<td><!-- 좌석수 :  --></td>
 				</tr>
+				<tr>
+					<th>영화 검색</th>
+					<td><input type="text" id="searchName" /><ul id="autoComplete"></ul>
+						<input type="hidden" name="mvno" id="mvno"/><input type="hidden" id="runtime" />
+					</td>
+					<td></td>
+				</tr>
+				
 				<!-- <tr>
 					<th>좌석타입</th>
 					<td></td>

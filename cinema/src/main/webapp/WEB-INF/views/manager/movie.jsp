@@ -286,7 +286,7 @@ $(function(){
 					if(m.DDAY<0) html+="<span class='movie-dday'>D-"+(m.DDAY)*-1+"</span><br/>";
 					html+="<span><img class='gradeimg' src='${rootPath}/resources/img/"+gradeimgname+"'/></span>";
 					html+="<span class='movie-name'>"+m.MVNAME+"</span><br/>";
-					html+="<button type='button' class='btn btn-update' data-toggle='modal' data-target='#movieUpdateModal'>수정</button>&nbsp;<button type='button' class='btn btn-delete' >삭제</button>&nbsp;";
+					html+="&nbsp;<button type='button' class='btn btn-update' data-toggle='modal' data-target='#movieUpdateModal'>수정</button>&nbsp;<button type='button' class='btn btn-delete' >삭제</button>&nbsp;";
 					//html+="<button type='button'class='btn btn-detail' data-toggle='modal' data-target='#movieModal'>상세보기</button>";
 					html+="<span class='movie-runtime detail'>"+m.RUNTIME+"</span>";
 					html+="<span class='movie-grade detail'>"+m.GRADE+"</span>";
@@ -351,7 +351,7 @@ $(function(){
 </script>
 <c:set var="arr_genre" value="${fn:split('코미디,판타지,모험,SF,액션,드라마,스릴러/서스펜스,멜로/로맨스,전쟁,가족,범죄,애니메이션,호러,뮤지컬,다큐멘터리',',')}" />
 <div class="movieform-container container">
-<button type="button" id="enroll-trigger">영화 등록</button>
+<button type="button" id="enroll-trigger" class="btn">영화 등록</button>
 <div class="movieEnroll-wrap notwanted">
 	<form action="movieEnroll.do" method="post" name="movieFrm" enctype="multipart/form-data" onsubmit="validate()">
 	<table>
@@ -415,7 +415,7 @@ $(function(){
 		<tr>
 			<th>서브<br>이미지</th>
 			<td>
-				<button class="btn-file addFile">이미지 추가</button>
+				<button class="btn-file addFile btn">이미지 추가</button>
 				<div class="input-group mb-3 fileWrapper" style="padding:0px">
 				  <div class="input-group-prepend" style="padding:0px">
 				    <span class="input-group-text">서브이미지</span>
@@ -425,7 +425,7 @@ $(function(){
 				    <label class="custom-file-label">사진을 선택하세요</label>
 				  </div>
 				  &nbsp;
-				  <button type="button" class="btn-file removeFile">삭제</button>
+				  <button type="button" class="btn-file removeFile btn">삭제</button>
 			    </div>
 			</td>
 		</tr>
@@ -466,7 +466,7 @@ $(function(){
 			    <label class="custom-file-label">사진을 선택하세요</label>
 			  </div>
 			  &nbsp;
-			  <button type="button" class="btn-file removeFile removeFile_">삭제</button>
+			  <button type="button" class="btn-file removeFile removeFile_ btn">삭제</button>
 </div>
 </div>
 <!-- Modal -->
