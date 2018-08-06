@@ -82,5 +82,9 @@ public class ManagerServiceImpl implements ManagerService {
 		// TODO Auto-generated method stub
 		return mgd.updateMovie(m);
 	}
+	@Override
+	public int deleteMovie(int mvno) {
+		return mgd.deleteMovie(mvno);
+	}
 
 }

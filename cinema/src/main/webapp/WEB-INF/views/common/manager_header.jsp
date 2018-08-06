@@ -22,7 +22,7 @@
 	      <a class="nav-link" href="${rootPath }/manager/theater">영화관</a><!-- 팝업창. -->
 	    </li>
 	        <li class="nav-item">
-	      <a class="nav-link" href="${rootPath }/manager/">영화관</a><!-- 팝업창. -->
+	      <a class="nav-link" href="${rootPath }/manager/">매니저</a><!-- 팝업창. -->
 	    </li>
 	    <li class="nav-item">
 	      <a class="nav-link" href="${rootPath }/manager/room">상영관</a><!-- 팝업창. -->

@@ -98,4 +98,9 @@ public class ManagerDAOImpl implements ManagerDAO {
 		return sqlSession.update("manager.updateMovie", m);
 	}
 
+	@Override
+	public int deleteMovie(int mvno) {
+		return sqlSession.delete("manager.deleteMovie", mvno);
+	}
+
 }

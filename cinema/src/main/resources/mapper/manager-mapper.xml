@@ -86,4 +86,9 @@
                  		 </if>
                  		 where mvno=#{mvno}
 	</update>
+	
+	
+	<delete id="deleteMovie">
+		delete from movie where mvno=#{mvno}
+	</delete>
 </mapper>

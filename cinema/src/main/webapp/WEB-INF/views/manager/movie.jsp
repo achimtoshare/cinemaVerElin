@@ -23,6 +23,7 @@ div.forCopy{
 }
 ul#movie-list{
 	padding-left:0px;
+	position:relative;
 }
 li.movie-item{
 	border:1px solid black;
@@ -31,6 +32,7 @@ li.movie-item{
 	width:200px;
 	height:260px;
 	cursor:pointer;
+	position: relative;
 }
 div.movie-poster img{
 	width:100%;
@@ -95,6 +97,19 @@ button.btn-update, button.btn-delete{
 	height:35px;
 	background-color:lightgray;
 	padding:0px;
+}
+span.movie-dday{
+	background:black;
+	color:white;
+	opacity: 0.6;
+	border-radius: 7px;
+	font-weight: bold;
+	position: relative;
+	top:-202px;
+	left: 68px;
+}
+.container{
+	height:100%;
 }
 /* button.btn-detail{
 	width:70px;
@@ -260,6 +275,27 @@ $(function(){
 		
 	});
 	
+	
+	//영화 삭제 버튼 클릭 이벤트
+	$("ul#movie-list").on("click","button.btn-delete",function(){
+		if(confirm("정말 삭제하시겠습니까?")){
+			$.ajax({
+				url:"deleteMovie.do",
+				type:"post",
+				dataType:"json",
+				data:{mvno:$(this).siblings("span.movie-mvno").text()},
+				success:function(data){
+					if(data>0){
+						alert("삭제하였습니다.");
+					}else{
+						alert("삭제 실패");
+					}
+					
+				}
+			});
+		}
+	});
+	
 	function selectMovieList(){
 		
 		console.log("영화 목록을 가져와라 ");
@@ -283,10 +319,10 @@ $(function(){
 					html+="<li class='movie-item'>";
 					html+="<div class='movie-poster'><img src='${rootPath}/resources/upload/movie/"+m.POSTER+"'/></div>";
 					html+="<div class='movie-info'>";
-					if(m.DDAY<0) html+="<span class='movie-dday'>D-"+(m.DDAY)*-1+"</span><br/>";
 					html+="<span><img class='gradeimg' src='${rootPath}/resources/img/"+gradeimgname+"'/></span>";
 					html+="<span class='movie-name'>"+m.MVNAME+"</span><br/>";
 					html+="&nbsp;<button type='button' class='btn btn-update' data-toggle='modal' data-target='#movieUpdateModal'>수정</button>&nbsp;<button type='button' class='btn btn-delete' >삭제</button>&nbsp;";
+					if(m.DDAY<0) html+="<span class='movie-dday'>D-"+(m.DDAY)*-1+"</span>";
 					//html+="<button type='button'class='btn btn-detail' data-toggle='modal' data-target='#movieModal'>상세보기</button>";
 					html+="<span class='movie-runtime detail'>"+m.RUNTIME+"</span>";
 					html+="<span class='movie-grade detail'>"+m.GRADE+"</span>";

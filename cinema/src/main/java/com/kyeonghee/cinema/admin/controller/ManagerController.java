@@ -357,6 +357,17 @@ public class ManagerController {
 	}
 	
 	
+	//영화 삭제 
+	@RequestMapping("/manager/deleteMovie.do")
+	@ResponseBody
+	public int deleteMovie(@RequestParam(value="mvno") int mvno) {
+		
+		int result = mgs.deleteMovie(mvno);
+		
+		return result;
+	}
+	
+	
 	
 	
 	
@@ -457,19 +468,12 @@ public class ManagerController {
 	
 	@RequestMapping("/manager/scheduleEnroll.do")
 	public ModelAndView insertSchedule(@RequestParam(value="mvno") int mvno, @RequestParam(value="rno") int rno,
-			@RequestParam(value="sTime") String sTime, @RequestParam(value="eTime") String eTime,@RequestParam(value="sno",defaultValue="0") int sno) {
+			@RequestParam(value="sTime") String sTime, @RequestParam(value="eTime") String eTime) {
 		ModelAndView mav = new ModelAndView();
-		
-		//좌석 값들 가져오기 
-	/*	Map<String,Object> seatInfo=new HashMap<>();
-		seatInfo = mgs.selectSeatInfo(sno);
-		*/
-		
 		
 		
 		//중복 검사 함수
 		boolean isDuplicate=checkDuplicateSchedule(sTime, eTime,rno,0);
-		
 		
 		if(!isDuplicate) {
 			Map<String,Object> map = new HashMap<>();
@@ -477,8 +481,6 @@ public class ManagerController {
 			map.put("rno", rno);
 			map.put("sTime", sTime);
 			map.put("eTime", eTime);
-	/*		map.put("seat", seatInfo.get("shape"));
-			map.put("lseat", seatInfo.get("lseat"));*/
 			System.out.println("#############map"+map);
 			
 			int result = mgs.insertSchedule(map);
@@ -492,9 +494,6 @@ public class ManagerController {
 	
 	// 등록/수정하려는 시간과 이미 존재하는 스케쥴이 중복되는지 검사하는 메소드.
 	private boolean checkDuplicateSchedule(String sTime,String eTime, int rno,int shno) {
-		
-		/*, , ,;*/
-		
 		String date = sTime.substring(0, 10);
 		Map<String,Object> map=new HashMap<>();
 		map.put("date", date);
@@ -504,7 +503,6 @@ public class ManagerController {
 		if(shno!=0) map.put("shno", shno);
 		List<Map<String,Object>> list =selectSchedule(map);
 	
-		
 		int stotal_new = Integer.parseInt(sTime.substring(11, 13))*60+Integer.parseInt(sTime.substring(14));
 		int etotal_new = Integer.parseInt(eTime.substring(11, 13))*60+Integer.parseInt(eTime.substring(14));
 		
@@ -520,10 +518,7 @@ public class ManagerController {
 				logger.info("겹칩니다. 시간");
 				return true;
 			}
-			
 		}
-		
-		
 		return false;
 	}
 	
@@ -546,8 +541,6 @@ public class ManagerController {
 			map.put("shno",shno);
 			map.put("sTime", sTime);
 			map.put("eTime", eTime);
-	/*		map.put("seat", seatInfo.get("shape"));
-			map.put("lseat", seatInfo.get("lseat"));*/
 			System.out.println("#############map"+map);
 			
 		

@@ -36,4 +36,6 @@ public interface ManagerService {
 
 	int updateMovie(Movie m);
 
+	int deleteMovie(int mvno);
+
 }
