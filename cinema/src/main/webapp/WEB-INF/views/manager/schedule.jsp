@@ -97,7 +97,6 @@ $(function(){
 		//전에 선택된 시간 class chooseTime 제거하기
 		removeChooseTime();
 		
-
 		var start = parseInt( $(this).attr("total-min"));
 		var end= Math.ceil((start+ parseInt($("input#runtime").val())+10)*0.1)*10;
 		console.log("시간을 선택했을 때");
